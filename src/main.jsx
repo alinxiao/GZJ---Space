@@ -9,8 +9,8 @@ const projects = [
     en: 'JIULONGGANG COMMUNITY',
     type: '社区商业 / 城市更新',
     year: '2026',
-    image: '/images/projects/jiulonggang-cover.png',
-    detailImage: '/images/details/jiulonggang-detail.png',
+    image: '/images/projects/jiulonggang-cover.jpg',
+    detailImage: '/images/details/jiulonggang-detail.jpg',
     description: '以“持续探索”为核心，将旧冷冻厂转译为融合餐饮、共享工坊、创业孵化与社区生活的复合场域。',
     meta: ['18,600 m² 场地研究', '1,600 m² 室内设计', '全案策略与空间表达'],
   },
@@ -20,7 +20,7 @@ const projects = [
     en: 'ORIENTAL POETICS',
     type: '餐饮空间 / 文化叙事',
     year: '2025',
-    image: '/images/projects/jinling-cover.png',
+    image: '/images/projects/jinling-cover.jpg',
     detailImage: '/images/details/jinling-detail.png',
     description: '让北京菜系与南京古都文化展开时空对话，以路径、镜面与层次重构东方餐饮空间。',
     meta: ['动线重构', '品牌语境提炼', '效果表达'],
@@ -31,8 +31,8 @@ const projects = [
     en: 'BAY CULTURAL HUB',
     type: '展陈设计 / 厂房改造',
     year: '2025',
-    image: '/images/projects/wanhai-cover.png',
-    detailImage: '/images/details/wanhai-detail.png',
+    image: '/images/projects/wanhai-cover.jpg',
+    detailImage: '/images/details/wanhai-detail.jpg',
     description: '从渔港、工业与珊瑚意象中提取空间语言，探索地域文化与交互式展陈的共同生长。',
     meta: ['厂房再生', '互动展陈', '地域文化'],
   },
@@ -51,9 +51,9 @@ const projects = [
 
 const strengths = [
   ['01', '空间策略', '从场地研究、业态逻辑到动线规划，把概念转化为可沟通、可推进的空间方案。', '/images/abilities/strategy.jpg'],
-  ['02', '设计表达', '熟悉平面方案、施工图、建模与效果表达，在不同阶段保持信息清晰与视觉完整。', '/images/abilities/expression.jpg'],
+  ['02', '设计表达', '熟悉平面方案、施工图、建模与效果表达，在不同阶段保持信息清晰与视觉完整。', '/images/abilities/expression-compressed.jpg'],
   ['03', 'AI 工作流', '关注生成式 AI 与空间设计的结合，用于概念发散、风格探索和汇报效率提升。', '/images/abilities/ai-application.png'],
-  ['04', '视觉叙事', '两年校园摄影团队经验，擅长从构图、光线与节奏中建立具有氛围感的故事。', '/images/abilities/visual-story.png'],
+  ['04', '视觉叙事', '两年校园摄影团队经验，擅长从构图、光线与节奏中建立具有氛围感的故事。', '/images/abilities/visual-story.jpg'],
 ]
 
 function Arrow({ diagonal = false }) {
@@ -134,6 +134,7 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeProject, setActiveProject] = useState(null)
   const [navFixed, setNavFixed] = useState(false)
+  const [loadHeroVideo, setLoadHeroVideo] = useState(false)
   const heroRef = useRef(null)
 
   useEffect(() => {
@@ -213,6 +214,28 @@ function App() {
     return () => { document.body.style.overflow = '' }
   }, [activeProject, menuOpen])
 
+  useEffect(() => {
+    let idleId = null
+    let timeoutId = null
+
+    const startLoadingVideo = () => {
+      const reduceMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      const saveData = typeof navigator !== 'undefined' && navigator.connection?.saveData
+      const smallScreen = typeof window !== 'undefined' && window.innerWidth < 900
+
+      if (reduceMotion || saveData || smallScreen) return
+      setLoadHeroVideo(true)
+    }
+
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      idleId = window.requestIdleCallback(startLoadingVideo, { timeout: 1800 })
+      return () => window.cancelIdleCallback(idleId)
+    }
+
+    timeoutId = window.setTimeout(startLoadingVideo, 1200)
+    return () => window.clearTimeout(timeoutId)
+  }, [])
+
   return (
     <main>
       <header className={`nav shell${navFixed ? ' nav-fixed' : ''}`}>
@@ -229,8 +252,8 @@ function App() {
       </header>
 
       <section className="hero" id="top" ref={heroRef}>
-        <video className="hero-video" autoPlay muted loop playsInline poster="/images/projects/community-45.jpg">
-          <source src="/hero-loop.mp4" type="video/mp4" />
+        <video className="hero-video" autoPlay={loadHeroVideo} muted loop playsInline preload={loadHeroVideo ? 'auto' : 'none'} poster="/images/projects/community-45.jpg">
+          {loadHeroVideo && <source src="/hero-loop.mp4" type="video/mp4" />}
         </video>
         <div className="hero-shade" />
         <div className="hero-grid shell">
@@ -278,7 +301,7 @@ function App() {
         <div className="about-layout">
           <div className="portrait-wrap">
             <div className="portrait-grid" aria-hidden="true" />
-            <img src="/images/profile/guan-zhijun-motion-v2.png" alt="关智钧拖影风格个人照片" />
+            <img src="/images/profile/guan-zhijun-motion-v2.png" alt="关智钧拖影风格个人照片" loading="lazy" decoding="async" />
             <div className="portrait-label">GUAN ZHIJUN<br />HUIZHOU, CHINA</div>
           </div>
           <div className="about-copy">
@@ -310,7 +333,7 @@ function App() {
           {projects.map(project => (
             <article className="project-card" key={project.id} onClick={() => setActiveProject(project)}>
               <div className="project-media">
-                <img src={project.image} alt={project.title} />
+                <img src={project.image} alt={project.title} loading="lazy" decoding="async" />
                 <div className="project-overlay" />
                 <div className="project-number">SPATIAL STUDY / {project.id}</div>
                 <button type="button" aria-label={`查看${project.title}`}>VIEW <Arrow diagonal /></button>
@@ -330,7 +353,7 @@ function App() {
         <div className="ability-title"><h2>理性落地，<br />感性表达。</h2><p>能力不是软件清单，而是把复杂问题变成清晰方案的过程。</p></div>
         <div className="ability-grid">
           {strengths.map(([num, title, text, image]) => (
-            <article key={num}><img className="ability-image" src={image} alt="" /><span>{num}</span><div className="ability-mark">＋</div><h3>{title}</h3><p>{text}</p></article>
+            <article key={num}><img className="ability-image" src={image} alt="" loading="lazy" decoding="async" /><span>{num}</span><div className="ability-mark">＋</div><h3>{title}</h3><p>{text}</p></article>
           ))}
         </div>
         <div className="tools-line"><span>TOOLS</span><p>AutoCAD · SketchUp · Enscape · Photoshop · Midjourney · AI Workflow</p></div>
