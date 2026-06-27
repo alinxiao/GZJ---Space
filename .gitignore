@@ -2,3 +2,9 @@ node_modules
 *.log
 .DS_Store
 ~$*
+dist/
+aliyun-dist/
+asset-backups/
+tools/
+pnpm-workspace.yaml
+README-阿里云上线指南.md
